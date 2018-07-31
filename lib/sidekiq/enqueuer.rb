@@ -1,6 +1,7 @@
 require 'sidekiq/web'
 require 'sidekiq/enqueuer/version'
 require 'sidekiq/enqueuer/configuration'
+require 'sidekiq/enqueuer/queueable'
 require 'sidekiq/enqueuer/worker/instance'
 require 'sidekiq/enqueuer/worker/param'
 require 'sidekiq/enqueuer/worker/trigger'

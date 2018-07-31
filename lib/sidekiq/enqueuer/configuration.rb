@@ -1,7 +1,7 @@
 module Sidekiq
   module Enqueuer
     class Configuration
-      attr_accessor :jobs, :enqueue_using_async
+      attr_accessor :jobs, :enqueue_using_async, :marker_class
 
       IGNORED_CLASSES = %w(Sidekiq::Extensions
                            Sidekiq::Extensions::DelayedModel
@@ -28,14 +28,15 @@ module Sidekiq
       def application_jobs
         rails_eager_load
         all_jobs = []
-        all_jobs << sidekiq_jobs
+        all_jobs << sidekiq_jobs(@marker_class)
         all_jobs << active_jobs if defined?(::ActiveJob)
         all_jobs = all_jobs.flatten
         all_jobs.delete_if { |klass| IGNORED_CLASSES.include?(klass.to_s) }
       end
 
-      def sidekiq_jobs
-        ObjectSpace.each_object(Class).select { |k| k.included_modules.include?(::Sidekiq::Worker) }
+      def sidekiq_jobs(marker_class = nil)
+        marker_class ||= ::Sidekiq::Worker
+        ObjectSpace.each_object(Class).select { |k| k.included_modules.include?(marker_class) }
       end
 
       def active_jobs
